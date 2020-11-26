@@ -8,6 +8,7 @@ import { CContainer, CFade } from '@coreui/react'
 
 // routes config
 import routes from '../routes'
+import { isAuth } from '../Auth/Auth'
   
 const loading = (
   <div className="pt-3 text-center">
@@ -16,6 +17,7 @@ const loading = (
 )
 
 const TheContent = () => {
+  const isAuthenticated=isAuth();
   return (
     <main className="c-main">
       <CContainer fluid>
@@ -35,7 +37,7 @@ const TheContent = () => {
                   )} />
               )
             })}
-            <Redirect from="/" to="/dashboard" />
+            {isAuthenticated?<Redirect from="/" to="/dashboard" />:<Redirect from="/" to="/login" />}
           </Switch>
         </Suspense>
       </CContainer>
