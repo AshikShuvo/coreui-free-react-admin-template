@@ -1,5 +1,5 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Link, Redirect, useHistory } from 'react-router-dom'
 import {
   CButton,
   CCard,
@@ -15,9 +15,48 @@ import {
   CRow
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
+import { isAuth } from '../../../Auth/Auth';
+import {LoginValidate} from '../../../validate/LoginValidate'
+import Axios from 'axios';
+import  Config  from '../../../config';
 
 const Login = () => {
+  const isAuthenticated=isAuth();
+   const [data,setData]=useState({});
+   const [error,setError]=useState({})
+   const validate=LoginValidate;
+   const history=useHistory()
+   
+  if(isAuthenticated){
+    return <Redirect  to="/" />
+  }
+
+  const handleSubmit=(event)=>{
+      event.preventDefault();
+      setError(validate(data))
+      console.log(error)
+      if(error.success==true){
+        Axios.post(`${Config.baseApi}/account/signin`, {
+           username:data.userName ,
+           password:data.password
+       }).
+       then(response=>{
+         if(response.status!==200){
+           setError({success:false,error:'User dose not exist'})
+           return;
+         }
+         localStorage.setItem("w_auth", JSON.stringify(response.data));
+         history.push('/');
+       }).
+       catch(error=>{
+         setError({success:false,error:"Server error"})
+       })
+    }
+  
+  }
+ 
   return (
+    
     <div className="c-app c-default-layout flex-row align-items-center">
       <CContainer>
         <CRow className="justify-content-center">
@@ -25,16 +64,17 @@ const Login = () => {
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
-                  <CForm>
+                  <CForm onSubmit={handleSubmit}>
                     <h1>Login</h1>
                     <p className="text-muted">Sign In to your account</p>
+                    {error.success==false && <p className="text-danger" >{error.error}</p>}
                     <CInputGroup className="mb-3">
                       <CInputGroupPrepend>
                         <CInputGroupText>
                           <CIcon name="cil-user" />
                         </CInputGroupText>
                       </CInputGroupPrepend>
-                      <CInput type="text" placeholder="Username" autoComplete="username" />
+                      <CInput onChange={e=>setData({...data,userName:e.target.value})}type="text" placeholder="Username" autoComplete="username" />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
                       <CInputGroupPrepend>
@@ -42,11 +82,11 @@ const Login = () => {
                           <CIcon name="cil-lock-locked" />
                         </CInputGroupText>
                       </CInputGroupPrepend>
-                      <CInput type="password" placeholder="Password" autoComplete="current-password" />
+                      <CInput onChange={e=>setData({...data,password:e.target.value})}type="password" placeholder="Password" autoComplete="current-password" />
                     </CInputGroup>
                     <CRow>
                       <CCol xs="6">
-                        <CButton color="primary" className="px-4">Login</CButton>
+                        <CButton color="primary" type="submit" className="px-4">Login</CButton>
                       </CCol>
                       <CCol xs="6" className="text-right">
                         <CButton color="link" className="px-0">Forgot password?</CButton>

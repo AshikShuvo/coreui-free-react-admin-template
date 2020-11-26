@@ -8,8 +8,10 @@ import {
   CImg
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
+import { useHistory } from 'react-router-dom'
 
 const TheHeaderDropdown = () => {
+  const history=useHistory();
   return (
     <CDropdown
       inNav
@@ -83,6 +85,10 @@ const TheHeaderDropdown = () => {
         <CDropdownItem>
           <CIcon name="cil-lock-locked" className="mfe-2" /> 
           Lock Account
+        </CDropdownItem>
+        <CDropdownItem onClick={()=>{localStorage.removeItem("w_auth"); history.push('/')}}>
+          <CIcon name="cil-lock-locked" className="mfe-2" /> 
+          logout
         </CDropdownItem>
       </CDropdownMenu>
     </CDropdown>

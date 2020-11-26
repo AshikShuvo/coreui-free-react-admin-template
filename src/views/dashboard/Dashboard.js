@@ -15,11 +15,16 @@ import {
 import CIcon from '@coreui/icons-react'
 
 import MainChartExample from '../charts/MainChartExample.js'
+import { isAuth } from 'src/Auth/Auth.js'
+import { Redirect } from 'react-router-dom'
 
 const WidgetsDropdown = lazy(() => import('../widgets/WidgetsDropdown.js'))
 const WidgetsBrand = lazy(() => import('../widgets/WidgetsBrand.js'))
 
 const Dashboard = () => {
+  const isAuthenticated=isAuth()
+  if(!isAuthenticated)
+    return <Redirect  to="/login" />
   return (
     <>
       <WidgetsDropdown />
